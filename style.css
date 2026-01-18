@@ -49,7 +49,7 @@
             -moz-osx-font-smoothing: grayscale;
             margin: 0;          /* Remove default browser margins */
             padding: 0;         /* Remove default browser padding */
-            overflow: auto;   /* THIS IS CRITICAL: Hides the main scrollbars */
+            overflow-y: auto;   /* THIS IS CRITICAL: Hides the main scrollbars */
             overflow-x: hidden;
         }
         #app-wrapper {
