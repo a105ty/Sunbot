@@ -21,7 +21,8 @@ async function handleRegister() {
     const email = document.getElementById('register-username').value.trim(); 
     const p1 = document.getElementById('register-password1').value.trim();
     const p2 = document.getElementById('register-password2').value.trim();
-
+    const refInput = document.getElementById('register-ref').value.trim().toUpperCase(); // Kode punya orang lain
+    
     if (!email || !p1) return showStatus('status', 'Isi semua data', 'error');
     if (p1 !== p2) return showStatus('status', 'Password tidak sama', 'error');
 
@@ -31,10 +32,16 @@ async function handleRegister() {
         const cred = await createUserWithEmailAndPassword(auth, email, p1);
         const user = cred.user;
 
+        const prefix = email.split('@')[0].substring(0, 4).toUpperCase();
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        const generatedCode = prefix + randomNum;
+                
+
         // STRUKTUR DATA BARU (SESUAI JSON KAMU)
         const defaultData = {
             username: email.split('@')[0],
-            referal_code: "",
+            up_link: refInput ? refInput : "",//Anda menggunakan kode referral orang lain untuk mendaftar
+            down_link: generatedCode,//Anda memberikan kode referral Anda kepada orang lain,
             contact: {
                 email: email,
                 telegram: { chat_id: "", telegram_bot_url: "" }
@@ -79,7 +86,7 @@ async function handleLogin() {
     const password = document.getElementById('login-password').value.trim();
 
     if (!email || !password) return showStatus('login-status', 'Isi email & password', 'error');
-    showStatus('login-status', 'Sedang masuk...', 'warning');
+    showStatus('status', 'Sedang masuk...', 'warning');
 
     try {
         // 1. Login ke Firebase
@@ -94,7 +101,7 @@ async function handleLogin() {
             last_login: Date.now() 
         });
 
-        showStatus('login-status', '✅ Login Berhasil!', 'success');
+        showStatus('status', '✅ Login Berhasil!', 'success');
         
         // 3. Render dashboard tanpa refresh
         if (typeof renderLoginForm === 'function') renderLoginForm();
@@ -102,7 +109,7 @@ async function handleLogin() {
     } catch (error) {
         console.error("Login Error:", error); // Cek Console jika masih error
         const pesan = typeof getFriendlyMessage === 'function' ? getFriendlyMessage(error.code) : error.message;
-        showStatus('login-status', `❌ ${pesan}`, 'error');
+        showStatus('status', `❌ ${pesan}`, 'error');
     }
 }
 // ==========================================
@@ -236,63 +243,100 @@ function getFriendlyMessage(errorCode) {
 }
 async function saveCoin(coinRaw, settings) {
     if (!auth.currentUser) return showStatus('status', 'Login dulu!', 'error');
-    
-    // Gunakan window.idify jika ada, atau fallback manual
+
+    // Sanitasi nama koin
     const coinKey = window.idify ? window.idify(coinRaw) : coinRaw.replace(/[^a-zA-Z0-9]/g, '_');
 
     try {
-        // 1. Siapkan data untuk update ke Firestore
-        // Kita menggunakan "Dot Notation" agar hanya mengupdate bagian koin tersebut
+        // --- 1. UPDATE FIREBASE (Cloud) ---
+       
         const updateData = {};
-        updateData[`state.${coinKey}`] = settings;
+        for (const [key, value] of Object.entries(settings)) {
+            updateData[`state.${coinKey}.${key}`] = value;
+        }
 
-        // 2. Kirim perintah simpan ke Database
+        // Kirim ke database
         await updateDoc(doc(db, "users", auth.currentUser.uid), updateData);
         
-        // 3. Update Data Lokal (RAM) agar UI langsung berubah
+        // --- 2. UPDATE LOKAL (RAM) ---
         if (!window.data.state) window.data.state = {};
-        window.data.state[coinKey] = settings;
+        const oldData = window.data.state[coinKey] || {};
+        window.data.state[coinKey] = {
+            ...oldData,
+            ...settings
+        };        
+        console.log(`✅ Save Coin ${coinKey} success!`, window.data.state[coinKey]);
 
-        // 4. Update Cadangan (LocalStorage) agar tidak hilang saat refresh
+        // --- 3. UPDATE STORAGE (Cache Browser) ---
         localStorage.setItem('cached_data', JSON.stringify(window.data));
         
-        // 5. Beri notifikasi sukses
-        // Pastikan ada elemen dengan id 'status' di HTML atau sesuaikan parameter ini
+        // --- 4. NOTIFIKASI ---
         if(typeof showStatus === 'function') {
-            showStatus('status', `✅ ${coinRaw} tersimpan!`, 'success');
-        } else {
-            console.log(`✅ ${coinRaw} tersimpan!`);
-            alert(`Setting ${coinRaw} berhasil disimpan.`);
-        }
-        
+            showStatus('status', `✅ ${coinRaw} Save Success!`, 'success');
+        } 
         return true;
+
     } catch (e) {
         console.error("Save Error:", e);
         if(typeof showStatus === 'function') {
-            showStatus('status', `❌ Gagal: ${e.message}`, 'error');
-        } else {
-            alert(`Gagal menyimpan: ${e.message}`);
+            showStatus('status', `❌ Save Failed: ${e.message}`, 'error');
         }
         return false;
     }
 }
-
 // ==========================================
 // 6. SAVE PROFILE (Simpan Exchange & Contact)
 // ==========================================
 async function saveUserProfile(payload) {
-    if (!auth.currentUser) return;
+    if (!auth.currentUser) {
+        if(typeof showStatus === 'function') showStatus('status', 'Login dulu!', 'error');
+        else alert('Login dulu!');
+        return;
+    }
+
     try {
+        // 1. Update ke Firebase
+        // (Asumsi: payload sudah berisi data lengkap untuk exchange/contact)
         await updateDoc(doc(db, "users", auth.currentUser.uid), payload);
         
-        // Update local object secara manual agar responsif
-        if(payload.exchange) window.data.exchange = payload.exchange;
-        if(payload.contact) window.data.contact = payload.contact;
+        // 2. Update Local Data (RAM) dengan AMAN (Merging)
+        // Gunakan 'Spread Operator' (...) agar data lama tidak hilang
+        if (payload.exchange) {
+            window.data.exchange = {
+                ...(window.data.exchange || {}), // Ambil data lama
+                ...payload.exchange              // Timpa dengan yang baru
+            };
+        }
 
-        alert("Profil disimpan!");
+        if (payload.contact) {
+            window.data.contact = {
+                ...(window.data.contact || {}),
+                ...payload.contact
+            };
+        }
+
+        // 3. Update Cache Browser (PENTING!)
+        // Agar saat di-refresh, data baru tetap tampil
+        localStorage.setItem('cached_data', JSON.stringify(window.data));
+
+        // 4. Feedback ke User
+        console.log("✅ Profile Updated:", window.data);
+        
+        if (typeof showStatus === 'function') {
+            showStatus('status', 'Profil berhasil disimpan!', 'success');
+        } else {
+            alert("Profil disimpan!");
+        }
+
         if (window.closeModal) window.closeModal();
+
     } catch (e) {
-        alert("Gagal simpan: " + e.message);
+        console.error("Save Profile Error:", e);
+        if (typeof showStatus === 'function') {
+            showStatus('status', "Gagal simpan: " + e.message, 'error');
+        } else {
+            alert("Gagal simpan: " + e.message);
+        }
     }
 }
 

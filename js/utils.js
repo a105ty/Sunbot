@@ -76,59 +76,65 @@ function removeCoinPair(coinToRemove) {
                 const uniqueId = `chartContainer_${coin}`;
                 renderTradingView(coin, uniqueId);
             }
-        }function renderTradingView(coin, containerId) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-
-            // 1. Tentukan teks placeholder loading
-            const loadingText = `Memuat Chart: ${coin} (TradingView) — loading...`;
-            container.textContent = loadingText;
-
-            const symbolFormatted = 'BINANCE:' + coin.replace('/', '');
-
-            const initWidget = () => {
-                // Cek apakah TradingView sudah tersedia dan merupakan fungsi
-                if (window.TradingView && typeof window.TradingView.widget === 'function') {
-                    clearInterval(intervalId); // Hentikan retry jika berhasil
-                    container.innerHTML = ''; // Bersihkan placeholder
-
-                    try {
-                        new window.TradingView.widget({
-                            container_id: containerId,
-                            autosize: true,
-                            symbol: symbolFormatted,
-                            interval: '60',
-                            timezone: 'Etc/UTC',
-                            theme: 'dark',
-                            style: '1',
-                            locale: 'en',
-                            toolbar_bg: '#f1f3f6',
-                            hide_side_toolbar: false,
-                            allow_symbol_change: true
-                        });
-                    } catch (e) {
-                        // Tangani error jika widget gagal dibuat
-                        container.textContent = `⚠️ Gagal memuat chart untuk ${coin}.`;
-                        console.error('Error memuat TradingView:', e);
-                    }
-                }
-            };
-
-            // 2. Mulai polling (retry) setiap 500ms
-            const intervalId = setInterval(initWidget, 500);
-
-            // 3. Batasi waktu polling (misal 10 detik)
-            setTimeout(() => {
-                // Jika status masih loading, hentikan polling dan berikan pesan error
-                if (container.textContent === loadingText) {
-                    clearInterval(intervalId);
-                    container.textContent = `Chart ${coin} gagal dimuat setelah 10s. Periksa skrip TradingView.`;
-                }
-            }, 10000);
-
-            // Panggil sekali untuk kasus di mana skrip sudah dimuat sangat cepat
-            initWidget();
         }
+window.renderTradingView = function(coin, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // 1. Tentukan teks placeholder loading
+    const loadingText = `Memuat Chart: ${coin} (TradingView) — loading...`;
+    container.textContent = loadingText;
+
+    // [PERBAIKAN] Hapus Underscore (_) dan Slash (/) agar jadi format BTCUSDT
+    // TradingView Binance tidak mengenali "BTC_USDT", harus "BTCUSDT"
+    const symbolFormatted = 'BINANCE:' + coin.replace(/[\/_]/g, '');
+
+    const initWidget = () => {
+        // Cek apakah TradingView sudah tersedia
+        if (window.TradingView && typeof window.TradingView.widget === 'function') {
+            clearInterval(intervalId); // Hentikan retry jika berhasil
+            container.innerHTML = ''; // Bersihkan placeholder
+
+            try {
+                new window.TradingView.widget({
+                    container_id: containerId,
+                    autosize: true,
+                    symbol: symbolFormatted, // Gunakan simbol yang sudah dibersihkan
+                    interval: '60',
+                    timezone: 'Asia/Jakarta', // Opsional: Sesuaikan zona waktu
+                    theme: 'dark',
+                    style: '1',
+                    locale: 'en',
+                    toolbar_bg: '#f1f3f6',
+                    enable_publishing: false,
+                    hide_side_toolbar: false,
+                    allow_symbol_change: true,
+                    save_image: false
+                });
+            } catch (e) {
+                container.textContent = `⚠️ Gagal memuat chart untuk ${coin}.`;
+                console.error('Error memuat TradingView:', e);
+            }
+        }
+    };
+
+    // 2. Mulai polling (retry) setiap 500ms
+    const intervalId = setInterval(initWidget, 500);
+
+    // 3. Batasi waktu polling (10 detik)
+    setTimeout(() => {
+        if (container.textContent === loadingText) {
+            clearInterval(intervalId);
+            container.innerHTML = `<div style="padding:20px; text-align:center; color:orange">
+                Gagal memuat chart. Pastikan koneksi internet lancar.<br>
+                <button onclick="window.renderTradingView('${coin}', '${containerId}')">Coba Lagi</button>
+            </div>`;
+        }
+    }, 10000);
+
+    // Panggil sekali langsung
+    initWidget();
+}
 
 //===================================================
 //Academy Modules Data & Rendering Functions

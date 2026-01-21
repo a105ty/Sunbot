@@ -55,7 +55,10 @@ window.renderRegisterForm = function() {
             
             <input type="password" id="register-password2" placeholder="Ulangi Password" required 
                    style="margin: 4px 0; padding: 8px; font-size: 13px;">
+            <input data-tooltip="Kode Referral (Opsional) dapatkan diskon!!" type="text" id="register-ref" placeholder="Kode Referral (Opsional)"  
+                   style="margin: 4px 0; padding: 8px; font-size: 13px;">
             
+           
             <button onclick="handleRegister()" style="margin-top: 8px; padding: 8px; font-size: 14px;">Register</button>
             
             <p class="switch-link" style="margin-top: 10px; font-size: 12px;">
@@ -129,71 +132,68 @@ window.renderSelectedCard = function() {
             const settings = (window.data?.state?.[id]) || {};
             const isTrading = settings.trading || false;
             const coinSetting = {
-                // Note: sell_fraction tidak ada di JSON, jadi defaultnya 0
-                ttp: settings.trailing_tp ?? false,
+                trailing_tp: settings.trailing_tp ?? false,
                 trailing_tp_percent: settings.trailing_tp_percent ?? 0.01,
                 layer_percent_base: settings.layer_percent_base ?? 0.006,
                 layer_percent_step: settings.layer_percent_step ?? 0.002,
                 buy_amount: settings.buy_amount ?? 25,
                 max_layer: settings.max_layer ?? 15,
-                sell_layer: settings.sell_layer ?? 1,
-                sell_fraction: settings.sell_fraction ?? 1, // Tambahkan default yang wajar
                 rebound_percent: settings.rebound_percent ?? 0.025,
-                trading: settings.trading ?? false // 'trading' di JSON sama dengan 'running'
             };
 
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
-                <div class='inner'>                        
-                        <div style='display:flex; justify-content: space-between; width: 100%;'>
-                            <div>
-                                <strong>${escapeHtml(selected)}</strong>
-                                <div class='small'>per-coin bot settings</div>
-                            </div>
-                            
-                            <div style='display:flex;gap:8px'>
-                                <button id='run_${id}' data-tooltip="${isTrading ? 'Matikan Bot' : 'Jalankan Bot'}">
-                                    ${isTrading ? 'Stop' : 'Run'}
-                                </button> 
-                                <button class='save-btn' id='save_${id}' data-tooltip="Save Bot Settings">Save</button>
-                            </div>
-                        </div>
-                        <div class='chart' id='chart_${id}' style='margin-top:12px'>Chart will appear here</div>
-                        <div style='margin-top:12px'>
-                            <div class='form-grid'>
-                                <div><label data-tooltip="a">Buy amount (USDT)</label><input id='buy_${id}' type='number' step='0.1' value='${coinSetting.buy_amount}' /></div>
-                                <div><label data-tooltip="">Max layers</label><input id='layers_${id}' type='number' value='${coinSetting.max_layer}' /></div>
+                            <div class='inner'>                        
+                                    <div style='display:flex; justify-content: space-between; width: 100%; '>
+                                        <div>
+                                            <strong>${escapeHtml(selected)}</strong>
+                                            <div class='small'>per-coin bot settings</div>
+                                        </div>
+                                        
+                                        <div style='display:flex;gap:8px'>
+                                            <button id='run_${id}' data-tooltip="${isTrading ? 'Matikan Bot' : 'Jalankan Bot'}">
+                                                ${isTrading ? 'Stop' : 'Run'}
+                                            </button> 
+                                            <button class='save-btn' id='save_${id}' data-tooltip="Save Bot Settings">Save</button>
+                                        </div>
+                                    </div>
+                                    <div class='chart' id='chart_${id}' style='margin-top:12px'>Chart will appear here</div>
+                                    <div style='margin-top:12px'>
+                                        <div class='form-grid'>
+                                            <div data-tooltip="The amount of USDT to buy"><label >Buy amount (USDT)</label><input id='buy_${id}' type='number' step='0.1' value='${coinSetting.buy_amount}' /></div>
+                                            <div data-tooltip="Maximum number of Buy layers"><label >Max layers</label><input id='layers_${id}' type='number' value='${coinSetting.max_layer}' /></div>
 
-                                <div><label data-tooltip="">Layer base %</label><input id='base_${id}' type='number' step='0.0001' value='${coinSetting.layer_percent_base}' /></div>
-                                <div><label data-tooltip="">Layer step %</label><input id='step_${id}' type='number' step='0.0001' value='${coinSetting.layer_percent_step}' /></div>
-                                <div><label data-tooltip="">Trailing TP</label>
-                                    <select class='form-control-item' id='trail_${id}'>
-                                        <option value='false' ${!coinSetting.ttp ? 'selected' : ''}>Off</option>
-                                        <option value='true' ${coinSetting.ttp ? 'selected' : ''}>On</option>
-                                    </select>
+                                            <div data-tooltip="base increment for each layer">
+                                                <label >Layer base</label>
+                                                <input id='base_${id}' type='number' step='0.0001' value='${coinSetting.layer_percent_base}' />
+                                            </div>
+                                            <div data-tooltip="extra increment for each layer">
+                                                <label >Layer Increment Step</label>
+                                                <input id='step_${id}' type='number' step='0.0001' value='${coinSetting.layer_percent_step}' />
+                                            </div>
+
+                                            <div data-tooltip="Take Profit with Trailing">
+                                                <label >Trailing TP</label>
+                                                <input id='trail_${id}' type='checkbox' ${coinSetting.trailing_tp ? 'checked' : ''} />
+                                            </div>
+                                            <div data-tooltip="Trailing Take Profit Triger">
+                                                <label >Trailing</label>
+                                                <input id='trailp_${id}' type='number' step='0.0001' value='${coinSetting.trailing_tp_percent}' />
+                                            </div>
+                                            <div data-tooltip="Rebound Trigger"><label >Rebound</label><input id='rebound_${id}' type='number' step='0.0001' value='${coinSetting.rebound_percent}' />
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
                                 </div>
-                                <div><label data-tooltip="">Trailing %</label><input id='trailp_${id}' type='number' step='0.0001' value='${coinSetting.trailing_tp_percent}' /></div>
-
-                                <div><label data-tooltip="">Sell layer %</label><input id='sell_${id}' type='number' step='0.0001' value='${coinSetting.sell_layer}' /></div>
-
-                                <div ><label data-tooltip="">Rebound %</label><input id='rebound_${id}' type='number' step='0.0001' value='${coinSetting.rebound_percent}' /></div>
-                                <div><label data-tooltip="">Trading</label><input id='label_${id}' type='text' value='${coinSetting.trading}' /></div>
-                            </div>
-                    </div>
-                </div>`
-                ;
+                            </div>`
+                            ;
 
             cards.appendChild(card);
 
             const saveButton = card.querySelector(`#save_${id}`);
             const runButton = card.querySelector(`#run_${id}`);
-            const trailSelect = card.querySelector(`#trail_${id}`);
-            
-            // Set the select value
-            if (trailSelect) {
-                trailSelect.value = coinSetting.ttp ? 'true' : 'false';
-            }
 
             // Attach save handler
             if (saveButton) {
@@ -218,7 +218,10 @@ function collectCardSettings(coin) {
             const id = window.idify(coin);
             const getNum = (eid) => { const el = document.getElementById(eid); return el ? parseFloat(el.value) || 0 : 0; };
             const getSel = (eid) => { const el = document.getElementById(eid); return el ? el.value === 'true' : false; };
-            
+            const isChecked = (eid) => { 
+                const el = document.getElementById(eid); 
+                return el ? el.checked : false; 
+            };
             // Ambil status trading lama dari 'state'
             const oldState = window.data?.state?.[id]?.trading || false;
 
@@ -230,8 +233,9 @@ function collectCardSettings(coin) {
                 trailing_tp_percent: getNum(`trailp_${id}`),
                 sell_layer: getNum(`sell_${id}`),
                 rebound_percent: getNum(`rebound_${id}`),
-                trailing_tp: getSel(`trail_${id}`), // Pastikan key ini sama dengan JSON
+                trailing_tp: isChecked(`trail_${id}`),
                 trading: oldState
+                
             };
         }
 window.toggleCoinTrading = async function(coin) {
@@ -286,7 +290,7 @@ window.toggleCoinTrading = async function(coin) {
                 <h2>About SunBot</h2>
                 <p>SunBot is a demo trading-bot control panel. Founder: Nama Founder. Version: 0.9-demo.</p>
                 <div style='text-align:right;margin-top:12px'>
-                    <button class='nav-btn' onclick='closeModal()'>Close</button>
+                    <button class='nav-btn' onclick='closeModal()' data-tooltip="Close About">Close</button>
                 </div>`);
         }
         
@@ -309,7 +313,7 @@ window.toggleCoinTrading = async function(coin) {
                 <div><label>Username</label>
                     <label>${username}</label>
                 </div>
-                <div>
+                <div data-tooltip="The exchange you are using for Sunbot">
                     <label>Exchange</label>
                     <label>${exchange}</label>
                 </div>
@@ -329,7 +333,7 @@ window.toggleCoinTrading = async function(coin) {
                         <input id='um_email' type='text' value='${email}' style='margin-top:8px' />
                     </div>
                 </div>
-                <div>
+                <div data-tooltip="Charge from your profit with Sunbot services">
                     <label>Credit Fees</label>
                     <label>${credit_fee_percent}</label>
                 </div>
@@ -337,27 +341,27 @@ window.toggleCoinTrading = async function(coin) {
                     <label>Profit</label>
                     <label>${creditProfit}</label>
                 </div>
-                <div>
+                <div data-tooltip="Credit saldo available for trading">
                     <label>Saldo Credit</label>
                     <label>${creditSaldo}</label>
                 </div>
-                <div>
+                <div data-tooltip="Total USDT">
                     <label>Balance :</label>
                     <label>${balance}</label>
                 </div>    
 
-                <div style='grid-column:1/3'>
+                <div style='grid-column:1/3' data-tooltip="Your API key for exchange connection (kept secret)">
                     <label>API Key</label>
                     <input id='um_key' type='text' value='***' />
                 </div>
-                <div style='grid-column:1/3'>
+                <div style='grid-column:1/3' data-tooltip="Your Secret Key for exchange connection (kept secret)">
                     <label>Secret Key</label>
                     <input id='um_secret' type='text' value='***' />
                 </div>
             </div>
             <div style='display:flex;justify-content:flex-end;gap:8px;margin-top:12px'>
-                <button class="nav-btn" id="btnTheme">Theme</button>
-                <button class='nav-btn' id='btnSaveUserProfile'>Save</button>
+                <button class="nav-btn" id="btnTheme" data-tooltip="Change Theme">Theme</button>
+                <button class='nav-btn' id='btnSaveUserProfile' data-tooltip="Save User Profile">Save</button>
                 <button class='nav-btn' onclick='closeModal()'>Close</button>
             </div>`);
             document.getElementById('btnSaveUserProfile').onclick = () => {
@@ -444,7 +448,39 @@ window.openThemeSelector = function() {
         </div>
     `);
 }
+window.handleServerAlert = async function() {
+    // 1. Cek apakah ada pesan dari server?
+    const alertData = window.data?.server_alert;
 
+    // 2. Jika ada, dan statusnya masih ACTIVE (belum dibaca/ditutup)
+    if (alertData && alertData.is_active) {
+        
+        // Tampilkan Notifikasi menggunakan fungsi showStatus kamu
+        // alertData.type bisa 'error' (merah), 'warning' (kuning), 'success' (hijau)
+        if (typeof showStatus === 'function') {
+            showStatus('status', `🔔 SISTEM: ${alertData.message}`, alertData.type || 'info');
+        } else {
+            alert(`SISTEM: ${alertData.message}`);
+        }
+
+        // 3. MATIKAN PESAN (Agar tidak muncul terus menerus saat refresh)
+        // Kita update 'is_active' jadi false di Firebase
+        try {
+            const uid = auth.currentUser?.uid;
+            if (uid) {
+                // Kita gunakan updateDoc dari firebase/firestore
+                // Pastikan kamu import updateDoc dan doc di bagian atas module script kamu jika perlu,
+                // atau gunakan global variable 'db' yg sudah ada.
+                await updateDoc(doc(db, "users", uid), {
+                    "server_alert.is_active": false
+                });
+                console.log("✅ Pesan server ditandai sudah dibaca.");
+            }
+        } catch (e) {
+            console.error("Gagal mark-as-read notifikasi:", e);
+        }
+    }
+}
 // js/app.js - Bagian Paling Bawah
 
 window.renderAll = async function() {
@@ -460,37 +496,17 @@ window.renderAll = async function() {
             console.error("Cache rusak.");
         }
     }
-    
-    // [PENTING] Jika data kosong (belum login), kita buat object kosong
-    // supaya kode di bawah tidak error saat baca 'window.data.state'
     if (!window.data) window.data = { state: {} }; 
-
-    // 2. RENDER LOGIN FORM
-    // Fungsi ini pintar: kalau belum login dia munculkan form input,
-    // kalau sudah login dia munculkan tombol Logout & Saldo.
     if (window.renderLoginForm) window.renderLoginForm();
-    
-    // ============================================================
-    // 3. RENDER DASHBOARD (KOIN & CARD) - INI PERUBAHANNYA
-    // ============================================================
-    // Dulu kode ini ada di dalam "if (token)". 
-    // Sekarang kita keluarkan agar SELALU dieksekusi.
-    
     console.log("Merender dashboard (Login/Guest Mode)...");
-    
-    // A. Render Daftar Koin (Kiri)
     if (window.renderCoins) window.renderCoins();
-    
-    // B. Pilih Koin Default (Jika belum ada yang dipilih)
     if (!window.selected && window.DEFAULT_COINS?.length > 0) {
         window.selected = window.DEFAULT_COINS[0];
     }
-    
-    // C. Render Card Setting (Kanan)
     if (typeof window.renderSelectedCard === 'function') {
         window.renderSelectedCard();
     } 
-    
+    if (window.handleServerAlert) window.handleServerAlert();
     // ============================================================
 
     // 4. TERAPKAN TEMA
