@@ -213,7 +213,7 @@
 
         .left .coins {
             margin-top: 12px;
-            max-height: 45vh;
+            max-height: 400px;
             overflow: auto;
             display: flex;
             flex-direction: column;
@@ -325,6 +325,7 @@
             width: 90%;
             max-width: 450px;
             min-height: 230px;
+            
             padding: 20px;
             display: flex;
             flex-direction: column;
@@ -478,3 +479,64 @@
             background-color: var(--bg-2);  
             border-radius: 8px;
         }
+/* === TOOLTIP STYLE (Penjelasan Tombol) === */
+
+/* 1. Siapkan elemen induk agar posisi tooltip akurat */
+[data-tooltip] {
+    position: relative;
+    cursor: pointer;
+}
+
+/* 2. Tampilan Kotak Penjelasan (Hidden by default) */
+[data-tooltip]::after {
+    content: attr(data-tooltip); /* Mengambil teks dari HTML */
+    position: absolute;
+    
+    /* Posisi: Muncul di ATAS tombol */
+    bottom: 120%; 
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* Desain Kotak */
+    background-color: rgba(0, 0, 0, 0.9); /* Hitam transparan */
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap; /* Jangan turun baris */
+    pointer-events: none; /* Agar tidak menghalangi klik */
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+
+    /* Efek Animasi */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+}
+
+/* 3. Tampilkan saat Hover */
+[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+    bottom: 130%; /* Efek naik sedikit */
+}
+
+/* KHUSUS: Untuk tombol header (Chart, About) agar tooltip muncul di BAWAH */
+header [data-tooltip]::after {
+    bottom: auto;
+    top: 130%;
+}
+header [data-tooltip]:hover::after {
+    bottom: auto;
+    top: 140%;
+}
+/* === FIX: Tooltip Panel Kiri === */
+/* Memindahkan tooltip ke BAWAH tombol agar tidak terpotong header/login */
+.left [data-tooltip]::after {
+    bottom: auto !important; /* Batalkan posisi atas */
+    top: 125% !important;    /* Pindah ke bawah tombol */
+    
+    /* Opsional: Pastikan z-index tinggi */
+    z-index: 9999;
+}
