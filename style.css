@@ -1,0 +1,543 @@
+        :root {
+            /* === COLOR VARIABLES === */
+            --nav-h: 64px;
+
+            /* Backgrounds */
+            --bg-1: #020617;
+            --bg-2: #0a0f28;
+            --bg-4: rgb(19, 25, 51);
+
+            /* Accents */
+            --accent-a: #00c8ff;
+            --accent-b: #0072ff;
+            --accent-c: #66d1ff;
+
+            /* Status Colors */
+            --muted: #ccc;
+            --muted2: #f8d7da;
+            --muted3: #f5c6cb;
+            --success: #155724;
+            --error: #721c24;
+
+            /* Texts */
+            --txt: #d7ebeb;
+
+            /* Buttons */
+            --btn: #e29f57;
+            --btn2: #d1568d;
+            --btn3: #1e27a7;
+            --btn4: #6d00fc;
+            --logout: #f44336;
+
+            /* Logo */
+            --bglogo: #fff7b3;
+            --bglogo2: #ffd96b;
+        }
+        /* === BASE RESET === */
+        * {
+            box-sizing: border-box;
+            color: var(--txt);
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            background: linear-gradient(180deg, var(--bg-1), var(--bg-2), var(--bg-1));
+            font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            margin: 0;          /* Remove default browser margins */
+            padding: 0;         /* Remove default browser padding */
+            overflow-y: auto;   /* THIS IS CRITICAL: Hides the main scrollbars */
+            overflow-x: hidden;
+        }
+        #app-wrapper {
+            height: 100vh; /* Use 100vh (viewport height) for certainty */
+            width: 100vw;  /* Use 100vw (viewport width) for certainty */
+            display: flex; /* Recommended for arranging header/sidebar/content */
+            flex-direction: column; /* Stacks items vertically */
+        }
+        #parent-container {
+            /* 1. Enable Flexbox */
+            display: flex;
+            
+            /* Ensure the container fills the screen */
+            min-height: 90vh; 
+            max-height: 100vh   ;
+            width: 100vw; 
+
+            /* 2. Center Horizontally */
+            justify-content: center;
+
+            /* 3. Center Vertically */
+            align-items: center;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid var(--muted);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--txt);
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+        }
+        input:hover, select:hover {
+            border-color: var(--bg-4);
+        }
+    /* === ALERT BOXES === */
+        .alert {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            color: var(--succes);
+            border: 1px solid var(--muted);        }
+        .error {
+            color: var(--eror);
+            border: 1px solid var(--muted3);
+        }
+    
+        /* NAV */   
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-h);
+            flex-shrink: 0; /* Prevents shrinking */
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+            backdrop-filter: blur(6px);
+            z-index: 50;            
+        }    
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+        .brand h1 {
+            font-size: 16px;
+            margin: 0
+        }
+        .logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, --bglogo, --bglogo2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--txt);
+            font-weight: 800
+        }    
+        nav {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+            align-items: center
+        }    
+        .nav-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 8px 12px;
+            border-radius: 10px;
+            color: var(--txt);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* animated LED border under header */
+        header::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 4px;
+            background: linear-gradient(45deg, var(--accent-a), var(--accent-), --accent-c);
+            background-size: 300% 100%;
+            animation: ledmove 6s linear infinite;
+            filter: blur(8px);
+            opacity: 0.95
+        }
+        
+        @keyframes ledmove {
+            0% {background-position: 0%}
+            50% {background-position: 100%}
+            100% {background-position: 0%}
+        }
+        /* === SHELL CONTAINER === */
+        .shell {
+            width: min(1180px, 96%);
+            margin: calc(var(--nav-h) + 20px) auto 40px;
+            padding: 18px;
+            padding-top: 3%;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 18px 60px rgba(2, 6, 23, 0.6);
+            min-height: calc(100vh - var(--nav-h) - 60px);
+        }
+
+        /* === LAYOUT GRID === */
+        .layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 16px;
+        }
+        .panel {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.004));
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.02)
+        }
+        /* === LEFT PANEL === */
+        .left .login {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .left .coins {
+            margin-top: 12px;
+            max-height: 400px;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-x: hidden;
+        }
+        .meta {
+            /* 1. Prevents wrapping to a new line */
+            white-space: nowrap; 
+            
+            /* 2. Hides the overflowing content */
+            overflow: hidden;
+            
+            /* 3. Adds the '...' ellipsis */
+            text-overflow: ellipsis;
+            
+        }
+
+        .coin-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            background: rgba(0, 0, 0, 0.06);
+        }
+        .coin-item .sym {
+            font-weight: 700;
+        }
+        
+        
+        /* === RIGHT PANEL === */
+        .right .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+        .controls {
+            display: flex;
+            gap: 8px
+        }
+        .cards {
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 12px
+        }
+
+        /* card + animated led border */
+        .card {
+            position: relative;
+            padding: 14px;
+            border-radius: 12px;
+            border: 2px solid;
+            border-color: pink;
+            background-color: #acc300;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            background: linear-gradient(90deg, var(--accent-a), --accent-c, var(--accent-b));
+            background-size: 300% 100%;
+            filter: blur(8px);
+            opacity: 0.9;
+            z-index: 1;
+            animation: ledmove 6s linear infinite
+        }
+        .card::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            border-radius: 10px;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.45));
+            z-index: 2;
+            pointer-events: none
+        }
+        .card .inner {
+            position: relative;
+            padding: 3px;
+            z-index: 3;
+        }    .form-control-item{
+            border-radius: 10px;
+        }    
+
+        .form-control-item:hover {
+            border: 1px solid var(--bg-4);
+        }   
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; 
+            gap: 0px 2px; /* Jarak antar item */
+        }
+
+        /* === CHART === */
+        .chart {
+            height: 220px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.008));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* === LOGIN AREA === */
+        #loginArea {
+            background-color: var(--bg-2) ;
+            width: 90%;
+            max-width: 450px;
+            min-height: 230px;
+            
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+        }
+        #loginArea:hover{
+            background-color: var(--bg-4);
+        }
+        
+        /* === THEMES === */
+        
+        .theme-default header::after,
+        .theme-default .card::before {
+            background: linear-gradient(135deg, #2fb0ff, #4bd371, #6dd3ff)
+        }
+        
+        .theme-electric header::after,
+        .theme-electric .card::before {
+            background: linear-gradient(45deg, #ff66b2, #7a5cff, #00f0ff)
+        }
+        .theme-light header::after,
+        .theme-light .card::before {
+            background: #cadbe9
+                }
+        /*=== Window Sizing ===*/
+        @media (max-width:900px) {
+            .layout {
+                grid-template-columns: 1fr
+            }
+            .shell {
+                margin: calc(var(--nav-h) + 12px) 8px 32px
+            }
+        }
+
+        /* footer spacing help */
+        .shell::after {
+            content: '';
+            display: block;
+            height: 40px
+        }
+        
+        /* === SCROLLBAR === */
+        ::-webkit-scrollbar {
+            scroll-behavior: smooth;
+            width: 10px;
+            height: 10px
+        }   
+        ::-webkit-scrollbar-track {
+            background: transparent
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--accent-a), var(--accent-b));
+            border-radius: 10px
+        }
+        
+        /* === SCROLLBAR STYLING UNTUK MODAL === */
+        #modalContent::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        #modalContent::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #modalContent::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--accent-a, #00aaff), var(--accent-b, #0066ff));
+            border-radius: 10px;
+        }
+        /* Firefox (scrollbar-width & color) */
+        #modalContent {
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-a, #00aaff) transparent;
+        }
+        
+        /* ==== OTHERS ===*/
+        label {
+            font-size: 13px;
+            color: var(--muted);
+            display: block
+        }    
+        input[type=text],
+        input[type=number],
+        select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            background: transparent;
+            color: inherit
+        }
+        /* ===button=== */
+        .pill,  .save-btn  {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: none;
+            background: linear-gradient(90deg, var(--btn3), var(--btn4));
+            color: var(--txt);
+            cursor: pointer;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .pill:hover {
+            background-color: #ad4a4a;
+        }
+        button, input, select{
+            border: none;
+            outline: none;
+            border-radius: 8px;
+            padding: 10px;
+            background: linear-gradient(90deg, var(--btn), var(--btn2));
+            color: var(--txt);
+            font-size: 14px;
+            cursor: pointer;
+            max-height:40px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        button:hover, input:hover, select:hover {
+            border: 1px solid var(--bg-4);
+            background: linear-gradient(90deg, var(--btn2), var(--btn));
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        button:active, input:active, select:active {
+            background: linear-gradient(90deg, var(--btn2), var(--btn));
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover{
+            background-color: var(--accent-a) ;
+        }   
+        
+        .stop-btn {
+            background: linear-gradient(45deg, var(--logout), #d32f2f) !important;
+        }
+        .stop-btn:hover{
+            background-color: #b43737;
+        }
+         
+        select {-webkit-appearance: none; 
+            -moz-appearance: none;
+            appearance: none;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--txt);
+        }    
+        option {
+            background-color: var(--bg-2);  
+            border-radius: 8px;
+        }
+/* === TOOLTIP STYLE (Penjelasan Tombol) === */
+
+/* 1. Siapkan elemen induk agar posisi tooltip akurat */
+[data-tooltip] {
+    position: relative;
+    cursor: pointer;
+}
+
+/* 2. Tampilan Kotak Penjelasan (Hidden by default) */
+[data-tooltip]::after {
+    content: attr(data-tooltip); /* Mengambil teks dari HTML */
+    position: absolute;
+    
+    /* Posisi: Muncul di ATAS tombol */
+    bottom: 120%; 
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* Desain Kotak */
+    background-color: rgba(0, 0, 0, 0.9); /* Hitam transparan */
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap; /* Jangan turun baris */
+    pointer-events: none; /* Agar tidak menghalangi klik */
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+
+    /* Efek Animasi */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+}
+
+/* 3. Tampilkan saat Hover */
+[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+    bottom: 130%; /* Efek naik sedikit */
+}
+
+/* KHUSUS: Untuk tombol header (Chart, About) agar tooltip muncul di BAWAH */
+header [data-tooltip]::after {
+    bottom: auto;
+    top: 130%;
+}
+header [data-tooltip]:hover::after {
+    bottom: auto;
+    top: 140%;
+}
+/* === FIX: Tooltip Panel Kiri === */
+/* Memindahkan tooltip ke BAWAH tombol agar tidak terpotong header/login */
+.left [data-tooltip]::after {
+    bottom: auto !important; /* Batalkan posisi atas */
+    top: 125% !important;    /* Pindah ke bawah tombol */
+    
+    /* Opsional: Pastikan z-index tinggi */
+    z-index: 9999;
+}
