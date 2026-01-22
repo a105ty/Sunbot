@@ -1,0 +1,88 @@
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <title>V.O.R.A. Project</title>
+        <link rel="icon" 
+            type="image/jpeg" 
+            href="https://raw.githubusercontent.com/a105ty/V.O.R.A.-Project-Website/main/WhatsApp%20Image%202025-11-03%20at%2016.02.25.jpeg">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/a105ty/Sunbot@main/templates/style.css"><body>
+        <header>
+            <div class="brand">
+                <div class="logo">☀️</div>
+                <div>
+                    <h1>SunBot</h1>
+                    <div class="small">Per-coin control</div>
+                </div>
+            </div>
+            <nav>
+                <button class="nav-btn" id="btnAcademy" data-tooltip="Belajar Trading">Academy</button>
+                <button class="nav-btn" id="btnChart" data-tooltip="Lihat Grafik Pasar">Chart</button>
+                <button class="nav-btn" id="btnAbout" data-tooltip="Tentang Aplikasi">About</button>
+                <button class="nav-btn" id="btnUser" data-tooltip="Profil & API Key">User</button>
+            </nav>
+        </header>
+        <div id="parent-container">
+            <main class="shell">
+            <div class="layout">
+                <div class="left">
+                    <div class="panel login">
+                        <div id="loginArea">
+                            <div id="app">
+                                <!-- Login View -->
+                                <div id="login-view">
+                                </div>
+                                <!-- Control Panel View -->
+                                <div id="control-view" style="display:block; padding: 8px;">
+                                    <p id="status" style="display:block; padding: 0px; margin: 0px;">Sunbot</p>
+                                </div>
+                            </div> 
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <strong>Coins</strong>
+                            <button class="nav-btn" id="btnRefresh" onclick="renderAll();">Refresh</button></div>
+                        <div class="left coins" id="coinsList"></div>
+                    </div>
+                </div>
+
+                <div class="right">
+                    <div class="panel header">
+                        <div>
+                            <div class="small">Selected coin</div>
+                            <h2 id="selectedCoin">(none)</h2>
+                            <div class="small" id="selectedSubtitle">Choose a coin to edit settings</div>
+                        </div>
+                        <div class="controls">
+                        </div>
+                    </div>
+
+                    <div id="cards" class="cards"></div>
+                </div>
+            </div>
+        </main>
+        <div class="modal-back" id="modalBack" style="backdrop-filter: blur(6px);display:none;position:fixed;inset:0;background:rgba(2,6,23,0.8);align-items:center;justify-content:center;z-index:200">
+            <div class="modal panel" id="modalContent" style="width:min(760px,96vw);max-width: 96vw;
+                max-height: 90vh;overflow-y: auto;scrollbar-width: thin;background: rgba(2,6,23,0.9);">
+            </div>
+        </div>
+        <div style="position:fixed;bottom:12px;left:50%;transform:translateX(-50%);color:var(--txt);font-size:13px;opacity:0.6;z-index:20">
+            Demo trading bot dashboard by BramT
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/gh/a105ty/Sunbot@main/js/templates/module.js?v=2"></script>
+        <script src="https://cdn.jsdelivr.net/gh/a105ty/Sunbot@main/templates/js/data.js?v=2"></script>
+        <script src="https://cdn.jsdelivr.net/gh/a105ty/Sunbot@main/templates/js/utils.js?v=2"></script>
+
+        <script type="module">
+            import 'https://cdn.jsdelivr.net/gh/a105ty/Sunbot@main/templates/js/app.js?v=2';
+            import 'https://cdn.jsdelivr.net/gh/a105ty/Sunbot@main/templates/js/api.js?v=2';
+            console.log("🚀 Loaded JS from GitHub Cloud");
+        </script>
+        <script>
+        
+        </script>
+    </body>
+    </html>
